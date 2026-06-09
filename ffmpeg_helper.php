@@ -1,11 +1,20 @@
 <?php
-// ffmpeg_helper.php
+// ffmpeg_helper.php (Sudah diperbaiki untuk Windows + Linux Railway)
 
 function getFFmpegPaths() {
+    // Jika berjalan di server Linux (Railway/Render)
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        return [
+            'ffmpeg' => 'ffmpeg',
+            'ffprobe' => 'ffprobe'
+        ];
+    }
+
+    // --- DI BAWAH INI ADALAH LOGIKA ASLI KHUSUS UNTUK LAPTOP KAMU (WINDOWS) ---
     $ffmpeg = 'ffmpeg';
     $ffprobe = 'ffprobe';
 
-    // 1. Try standard command line detection
+    // 1. Try standard command line detection (Windows Style)
     $ffmpeg_where = shell_exec('where ffmpeg 2>nul');
     if ($ffmpeg_where) {
         $ffmpeg = trim(explode("\n", $ffmpeg_where)[0]);

@@ -1,5 +1,5 @@
 <?php
-// api.php
+// api.php (Sudah Diperbaiki untuk Windows Localhost & Linux Railway)
 header('Content-Type: application/json');
 
 $action = $_GET['action'] ?? '';
@@ -37,11 +37,23 @@ function handleUpload() {
         exit;
     }
     
+    // --- FIX PERMISSION: Pastikan folder utama uploads ada dan terbuka ---
+    $uploadParent = __DIR__ . '/uploads';
+    if (!is_dir($uploadParent)) {
+        mkdir($uploadParent, 0777, true);
+    }
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        chmod($uploadParent, 0777);
+    }
+
     $taskId = 'task_' . bin2hex(random_bytes(8));
-    $taskDir = __DIR__ . '/uploads/' . $taskId;
+    $taskDir = $uploadParent . '/' . $taskId;
     
     if (!is_dir($taskDir)) {
         mkdir($taskDir, 0777, true);
+    }
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        chmod($taskDir, 0777);
     }
     
     $originalName = basename($file['name']);
@@ -98,18 +110,12 @@ function handleConvert() {
     
     require_once __DIR__ . '/ffmpeg_helper.php';
     $paths = getFFmpegPaths();
-    $ffprobe = $paths['ffprobe'];
     
-// --- PENYESUAIAN JALUR FFPROBE & FFMPEG (LINUX VS WINDOWS) ---
-    // Jika berjalan di Linux (Railway), panggil langsung perintah globalnya
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $ffprobeExec = '"' . $ffprobe . '"';
-        $ffmpegExec = '"' . $paths['ffmpeg'] . '"';
-    } else {
-        $ffprobeExec = 'ffprobe';
-        $ffmpegExec = 'ffmpeg';
-    }
-
+    // --- FIX PATH UNTUK LINUX VS WINDOWS ---
+    $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    $ffprobeExec = $isWindows ? '"' . $paths['ffprobe'] . '"' : 'ffprobe';
+    $ffmpegExec = $isWindows ? '"' . $paths['ffmpeg'] . '"' : 'ffmpeg';
+    
     // Get audio duration using ffprobe
     $ffprobeCmd = $ffprobeExec . ' -i ' . escapeshellarg($inputFile) . ' -show_entries format=duration -v quiet -of csv="p=0"';
     $duration = shell_exec($ffprobeCmd);
@@ -135,12 +141,12 @@ function handleConvert() {
     $meta['target_format'] = $targetFormat;
     file_put_contents($metaFile, json_encode($meta));
     
-    // --- PENYESUAIAN BACKGROUND WORKER (LINUX VS WINDOWS) ---
+    // --- FIX BACKGROUND WORKER DETACHMENT ---
     $phpBinary = PHP_BINARY;
     $workerScript = __DIR__ . '/convert_worker.php';
     
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        // Perintah latar belakang khusus WINDOWS (Localhost)
+    if ($isWindows) {
+        // Gaya Windows Localhost
         $cmd = 'cmd /c start /B "" "' . $phpBinary . '" "' . $workerScript . '"'
             . ' ' . escapeshellarg($taskId)
             . ' ' . escapeshellarg($targetFormat)
@@ -149,8 +155,7 @@ function handleConvert() {
             . ' ' . escapeshellarg($sampleRate);
         pclose(popen($cmd, 'r'));
     } else {
-        // Perintah latar belakang khusus LINUX (Railway)
-        // Menggunakan " > /dev/null 2>&1 &" agar script berjalan di background Linux
+        // Gaya Linux Railway (Menggunakan penutup > /dev/null 2>&1 & agar lepas ke background)
         $cmd = '"' . $phpBinary . '" "' . $workerScript . '"'
             . ' ' . escapeshellarg($taskId)
             . ' ' . escapeshellarg($targetFormat)
@@ -261,8 +266,13 @@ function handleCancel() {
         if (file_exists($pidFile)) {
             $pid = intval(trim(file_get_contents($pidFile)));
             if ($pid > 0) {
-                // Windows command to force kill process tree
-                shell_exec("taskkill /F /T /PID " . $pid);
+                // --- FIX CANCEL: Deteksi Windows vs Linux ---
+                if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    shell_exec("taskkill /F /T /PID " . $pid);
+                } else {
+                    // Di Linux, kita matikan proses id menggunakan perintah kill -9
+                    shell_exec("kill -9 " . $pid);
+                }
             }
         }
         
