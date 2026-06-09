@@ -100,14 +100,24 @@ function handleConvert() {
     $paths = getFFmpegPaths();
     $ffprobe = $paths['ffprobe'];
     
+// --- PENYESUAIAN JALUR FFPROBE & FFMPEG (LINUX VS WINDOWS) ---
+    // Jika berjalan di Linux (Railway), panggil langsung perintah globalnya
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $ffprobeExec = '"' . $ffprobe . '"';
+        $ffmpegExec = '"' . $paths['ffmpeg'] . '"';
+    } else {
+        $ffprobeExec = 'ffprobe';
+        $ffmpegExec = 'ffmpeg';
+    }
+
     // Get audio duration using ffprobe
-    $ffprobeCmd = '"' . $ffprobe . '" -i ' . escapeshellarg($inputFile) . ' -show_entries format=duration -v quiet -of csv="p=0"';
+    $ffprobeCmd = $ffprobeExec . ' -i ' . escapeshellarg($inputFile) . ' -show_entries format=duration -v quiet -of csv="p=0"';
     $duration = shell_exec($ffprobeCmd);
     $duration = floatval(trim($duration));
     
     if ($duration <= 0) {
         // Fallback: try using ffmpeg info output if ffprobe fails or duration is invalid
-        $ffmpegCmd = '"' . $paths['ffmpeg'] . '" -i ' . escapeshellarg($inputFile) . ' 2>&1';
+        $ffmpegCmd = $ffmpegExec . ' -i ' . escapeshellarg($inputFile) . ' 2>&1';
         $ffmpegOutput = shell_exec($ffmpegCmd);
         if (preg_match('/Duration: (\d+):(\d+):(\d+\.\d+)/', $ffmpegOutput, $matches)) {
             $hours = intval($matches[1]);
@@ -125,16 +135,31 @@ function handleConvert() {
     $meta['target_format'] = $targetFormat;
     file_put_contents($metaFile, json_encode($meta));
     
-    // Launch background worker script using cmd /c for reliable detachment on Windows
+    // --- PENYESUAIAN BACKGROUND WORKER (LINUX VS WINDOWS) ---
     $phpBinary = PHP_BINARY;
     $workerScript = __DIR__ . '/convert_worker.php';
-    $cmd = 'cmd /c start /B "" "' . $phpBinary . '" "' . $workerScript . '"'
-        . ' ' . escapeshellarg($taskId)
-        . ' ' . escapeshellarg($targetFormat)
-        . ' ' . escapeshellarg($bitrate)
-        . ' ' . escapeshellarg($channels)
-        . ' ' . escapeshellarg($sampleRate);
-    pclose(popen($cmd, 'r'));
+    
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        // Perintah latar belakang khusus WINDOWS (Localhost)
+        $cmd = 'cmd /c start /B "" "' . $phpBinary . '" "' . $workerScript . '"'
+            . ' ' . escapeshellarg($taskId)
+            . ' ' . escapeshellarg($targetFormat)
+            . ' ' . escapeshellarg($bitrate)
+            . ' ' . escapeshellarg($channels)
+            . ' ' . escapeshellarg($sampleRate);
+        pclose(popen($cmd, 'r'));
+    } else {
+        // Perintah latar belakang khusus LINUX (Railway)
+        // Menggunakan " > /dev/null 2>&1 &" agar script berjalan di background Linux
+        $cmd = '"' . $phpBinary . '" "' . $workerScript . '"'
+            . ' ' . escapeshellarg($taskId)
+            . ' ' . escapeshellarg($targetFormat)
+            . ' ' . escapeshellarg($bitrate)
+            . ' ' . escapeshellarg($channels)
+            . ' ' . escapeshellarg($sampleRate)
+            . ' > /dev/null 2>&1 &';
+        shell_exec($cmd);
+    }
     
     echo json_encode(['success' => true, 'message' => 'Conversion process started.']);
     exit;
