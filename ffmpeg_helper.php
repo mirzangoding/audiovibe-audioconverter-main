@@ -1,12 +1,29 @@
 <?php
-// ffmpeg_helper.php (Sudah diperbaiki untuk Windows + Linux Railway)
+// ffmpeg_helper.php (Sudah diperbaiki mutlak untuk Windows + Linux Railway)
 
 function getFFmpegPaths() {
     // Jika berjalan di server Linux (Railway/Render)
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        $ffmpeg = 'ffmpeg';
+        $ffprobe = 'ffprobe';
+
+        // Trik Linux: Cek apakah ffmpeg terpasang di folder standar Linux
+        if (file_exists('/usr/bin/ffmpeg')) { $ffmpeg = '/usr/bin/ffmpeg'; }
+        if (file_exists('/usr/bin/ffprobe')) { $ffprobe = '/usr/bin/ffprobe'; }
+        
+        // Trik Linux 2: Jika masih belum ketemu, tanya ke sistem pakai perintah 'which'
+        if ($ffmpeg === 'ffmpeg') {
+            $whichFfmpeg = trim(shell_exec('which ffmpeg 2>/dev/null'));
+            if (!empty($whichFfmpeg)) { $ffmpeg = $whichFfmpeg; }
+        }
+        if ($ffprobe === 'ffprobe') {
+            $whichFfprobe = trim(shell_exec('which ffprobe 2>/dev/null'));
+            if (!empty($whichFfprobe)) { $ffprobe = $whichFfprobe; }
+        }
+
         return [
-            'ffmpeg' => 'ffmpeg',
-            'ffprobe' => 'ffprobe'
+            'ffmpeg' => $ffmpeg,
+            'ffprobe' => $ffprobe
         ];
     }
 
