@@ -1,0 +1,40 @@
+Command: "C:\Users\LENOVO\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.1-full_build\bin\ffmpeg.exe" -y -i "C:\Users\LENOVO\Documents\audiovibe-audioconverter-main/uploads/task_47f62c8f4a02cf04/input.mp3" -progress "C:\Users\LENOVO\Documents\audiovibe-audioconverter-main/uploads/task_47f62c8f4a02cf04/progress.txt" -ab "128k" -ac "1" -ar "22050" -codec:a aac "C:\Users\LENOVO\Documents\audiovibe-audioconverter-main/uploads/task_47f62c8f4a02cf04/converted.aac"
+
+ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers
+  built with gcc 15.2.0 (Rev13, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper
+  libavutil      60. 26.101 / 60. 26.101
+  libavcodec     62. 28.101 / 62. 28.101
+  libavformat    62. 12.101 / 62. 12.101
+  libavdevice    62.  3.101 / 62.  3.101
+  libavfilter    11. 14.101 / 11. 14.101
+  libswscale      9.  5.101 /  9.  5.101
+  libswresample   6.  3.101 /  6.  3.101
+[in#0/mp3 @ 00000266a6c51b80] Estimating duration from bitrate, this may be inaccurate
+Input #0, mp3, from 'C:\Users\LENOVO\Documents\audiovibe-audioconverter-main/uploads/task_47f62c8f4a02cf04/input.mp3':
+  Metadata:
+    date            : 2024-07-21
+    title           : Bali Is Peaceful
+    artist          : Palawara
+    album           : Bali Land Lounge
+    copyright       : ℗ 2024 Palawara
+    encoder         : Lavf60.3.100
+  Duration: 00:03:27.02, start: 0.000000, bitrate: 320 kb/s
+  Stream #0:0: Audio: mp3 (mp3float), 48000 Hz, stereo, fltp, 320 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (mp3 (mp3float) -> aac (native))
+Press [q] to stop, [?] for help
+Output #0, adts, to 'C:\Users\LENOVO\Documents\audiovibe-audioconverter-main/uploads/task_47f62c8f4a02cf04/converted.aac':
+  Metadata:
+    date            : 2024-07-21
+    title           : Bali Is Peaceful
+    artist          : Palawara
+    album           : Bali Land Lounge
+    copyright       : ℗ 2024 Palawara
+    encoder         : Lavf62.12.101
+  Stream #0:0: Audio: aac (LC), 22050 Hz, mono, fltp, 128 kb/s
+    Metadata:
+      encoder         : Lavc62.28.101 aac
+size=     256KiB time=00:00:40.30 bitrate=  52.0kbits/s speed=79.3x elapsed=0:00:00.50    size=     768KiB time=00:01:24.47 bitrate=  74.5kbits/s speed=82.4x elapsed=0:00:01.02    size=    1280KiB time=00:02:06.03 bitrate=  83.2kbits/s speed=81.9x elapsed=0:00:01.53    size=    2048KiB time=00:02:51.73 bitrate=  97.7kbits/s speed=83.5x elapsed=0:00:02.05    [out#0/adts @ 00000266a6bbce80] video:0KiB audio:2405KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 1.267427%
+size=    2435KiB time=00:03:27.02 bitrate=  96.4kbits/s speed=85.8x elapsed=0:00:02.41    
+[aac @ 00000266a87ab640] Qavg: 65409.586
